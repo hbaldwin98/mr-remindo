@@ -1,0 +1,26 @@
+{
+  "name": "mrremindo",
+  "version": "1.0.0",
+  "description": "A discord bot to remind users about designated events on a scheduled basis.",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node server.ts",
+    "start:dev": "nodemon server.ts",
+    "update-commands": "ts-node deploy-commands.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Wittick",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/rest": "^1.1.0",
+    "discord.js": "^14.3.0",
+    "rxjs": "^7.5.6",
+    "sqlite": "^4.1.2",
+    "sqlite3": "^5.0.11",
+    "winston": "^3.8.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19",
+    "ts-node": "^10.9.1"
+  }
+}
