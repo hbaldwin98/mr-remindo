@@ -102,7 +102,7 @@ client.on('interactionCreate', async (interaction: BaseInteraction) => {
       event.id = eventId.lastID;
       Scheduler.scheduleEvent(event);
       await interaction
-        .reply(`New event: **${event.name}** scheduled for ${event.formatTime()}`)
+        .reply(`@everyone\nNew event: **${event.name}** scheduled for ${event.formatTime()}`)
         .catch((err) => {
           logger.error('Failed to send interaction reply', err);
         });

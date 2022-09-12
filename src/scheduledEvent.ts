@@ -138,7 +138,23 @@ export class ScheduledEvent {
    * @returns The date formatted as {dayoftheweek} at {time}
    */
   formatTime() {
+    const month = this.date.getMonth();
+    const day = this.date.getDate();
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
     const hours = this.date.getHours() % 12;
     const minutes = this.date.getMinutes();
     const ampm = this.date.getHours() >= 12 ? 'pm' : 'am';
@@ -146,8 +162,8 @@ export class ScheduledEvent {
       days[this.date.getDay()] === days[new Date().getDay()] &&
       this.date.getDate() === new Date().getDate();
     // if the day is today, return today
-    const day = dayIsToday ? 'today' : days[this.date.getDay()];
-    return `${day} at ${hours < 10 ? '0' + hours : hours}:${
+    const dayOfWeek = dayIsToday ? 'today' : days[this.date.getDay()];
+    return `${dayOfWeek}, ${months[month]} ${day}, at ${hours}:${
       minutes < 10 ? '0' + minutes : minutes
     }${ampm}`;
   }
