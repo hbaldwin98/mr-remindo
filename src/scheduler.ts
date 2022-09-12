@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { ScheduledEvent } from './scheduledevent';
+import { ScheduledEvent } from './scheduledEvent';
 
 export class Scheduler {
   private static instance: Scheduler;

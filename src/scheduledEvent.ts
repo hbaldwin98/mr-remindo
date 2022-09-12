@@ -130,7 +130,7 @@ export class ScheduledEvent {
    * @returns the names of the event and the date
    */
   toString() {
-    return `${this.id} - **Name**: ${this.name}\n**Date**: ${this.date}`;
+    return `**Id:** ${this.id}\n**Name**: ${this.name}\n**Date**: ${this.date}`;
   }
 
   /**
@@ -142,10 +142,14 @@ export class ScheduledEvent {
     const hours = this.date.getHours() % 12;
     const minutes = this.date.getMinutes();
     const ampm = this.date.getHours() >= 12 ? 'pm' : 'am';
+    const dayIsToday =
+      days[this.date.getDay()] === days[new Date().getDay()] &&
+      this.date.getDate() === new Date().getDate();
     // if the day is today, return today
-    const day =
-      days[this.date.getDay()] === days[new Date().getDay()] ? 'today' : days[this.date.getDay()];
-    return `${day} at ${hours}:${minutes}${ampm}`;
+    const day = dayIsToday ? 'today' : days[this.date.getDay()];
+    return `${day} at ${hours < 10 ? '0' + hours : hours}:${
+      minutes < 10 ? '0' + minutes : minutes
+    }${ampm}`;
   }
 }
 

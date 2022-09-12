@@ -1,7 +1,7 @@
 import { Scheduler } from './scheduler';
 import { BaseInteraction, Client, GatewayIntentBits, TextChannel } from 'discord.js';
-import { token } from './config.json';
-import { ScheduledEvent, Repeat } from './scheduledevent';
+import { token } from '../config.json';
+import { ScheduledEvent, Repeat } from './scheduledEvent';
 import logger from './log';
 import { addEvent, deleteEvent, getEvents, initDb, updateEvent } from './database';
 

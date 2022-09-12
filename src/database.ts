@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3';
 import logger from './log';
-import { ScheduledEvent, Repeat } from './scheduledevent';
+import { ScheduledEvent, Repeat } from './scheduledEvent';
 const { open } = require('sqlite');
 
 const initDb = async () => {

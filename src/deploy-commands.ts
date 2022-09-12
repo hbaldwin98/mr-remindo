@@ -1,6 +1,6 @@
 import { REST, Routes, SlashCommandBuilder } from 'discord.js';
-import { clientId, token } from './config.json';
-import { Repeat } from './scheduledevent';
+import { clientId, token } from '../config.json';
+import { Repeat } from './scheduledEvent';
 
 const commands = [
   new SlashCommandBuilder()
