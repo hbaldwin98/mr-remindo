@@ -31,4 +31,5 @@ You'll need to follow Discord's own steps to create a bot account, however, once
 - If you make a mistake, delete the event and create a new one**.
 
 *The channel you create the event in will be the channel the bot will use to later alert.
+
 ** There is currently no way to edit an existing event.
