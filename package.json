@@ -5,10 +5,12 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node ./src/server.ts",
-    "start-process": "pm2 start ./src/server.ts",
+    "start-process": "pm2 start ./src/server.ts --name mrremindo --watch",
+    "stop-process": "pm2 stop mrremindo",
     "start:dev": "ts-node ./src/deploy-commands.ts dev && nodemon ./src/server.ts dev",
     "commands": "ts-node ./src/deploy-commands.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "./node_modules/.bin/pm2 install typescript"
   },
   "author": "Wittick",
   "license": "ISC",
