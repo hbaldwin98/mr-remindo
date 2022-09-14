@@ -12,7 +12,8 @@ You'll need to follow Discord's own steps to create a bot account, however, once
     "clientId": "{your bots clientid}"
   }
   ```
-  3. Run `npm run start`
+  3. Run `npm run commands` to initialize the bots client commands
+  4. Run `npm run start`
   
   The program will automatically create an `events.db` SQLite3 database to store events. The bot can now be used.
   
