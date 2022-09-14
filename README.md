@@ -29,8 +29,8 @@ You'll need to follow Discord's own steps to create a bot account, however, once
 
 - Events without a repeating pattern will be deleted after the event has started. Events with a repeating pattern repeat based on their repeat choice.
 
-- If you make a mistake, delete the event and create a new one**.
+- Use `/update {id}` and select fields to update
 
 *The channel you create the event in will be the channel the bot will use to later alert.
 
-** There is currently no way to edit an existing event.
+- You can use a development account by creating a new bot, assigning it's information int a `config-dev.json` and running `npm run start:dev` for development use.
