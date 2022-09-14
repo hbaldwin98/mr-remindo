@@ -1,18 +1,18 @@
 import { Scheduler } from './scheduler';
 import { BaseInteraction, Client, GatewayIntentBits, TextChannel } from 'discord.js';
 import { token } from '../config.json';
-import { token as tokenDev } from '../config-dev.json';
+// import { token as tokenDev } from '../config-dev.json';
 import { ScheduledEvent, Repeat } from './scheduledEvent';
 import logger from './log';
 import { deleteEvent, getEvents, initDb, updateEvent } from './database';
 import { CancelCommand, Command, ScheduleCommand, UpcomingCommand, UpdateCommand } from './commands/command';
 
-const dev = process.argv[2] === 'dev';
+// const dev = process.argv[2] === 'dev';
 let secret = token;
 
-if (dev) {
-  secret = tokenDev;
-}
+// if (dev) {
+//   secret = tokenDev;
+// }
 
 const client = new Client({
   intents: [GatewayIntentBits.MessageContent],

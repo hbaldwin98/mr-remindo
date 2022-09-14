@@ -1,16 +1,16 @@
 import { REST, Routes, SlashCommandBuilder } from 'discord.js';
 import { clientId, token } from '../config.json';
-import { clientId as clientIdDev, token as tokenDev } from '../config-dev.json';
+// import { clientId as clientIdDev, token as tokenDev } from '../config-dev.json';
 import { Repeat } from './scheduledEvent';
 
-const dev = process.argv[2] === 'dev';
+// const dev = process.argv[2] === 'dev';
 let clientID = clientId;
 let secret = token;
 
-if (dev) {
-  clientID = clientIdDev;
-  secret = tokenDev;
-}
+// if (dev) {
+//   clientID = clientIdDev;
+//   secret = tokenDev;
+// }
 
 const commands = [
   new SlashCommandBuilder()
