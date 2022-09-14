@@ -1,20 +1,32 @@
+import logger from './log';
 import { Scheduler } from './scheduler';
 export class ScheduledEvent {
   public name: string;
   public date: Date;
   public repeat?: Repeat;
   public channelId: string;
+  public guildId: string;
   public id: number;
-
   public lastReminder: Date;
+  public role: string;
 
-  constructor(date: string, time: string, name: string, repeat: Repeat, channelId: string) {
+  constructor(
+    date: string,
+    time: string,
+    name: string,
+    repeat: Repeat,
+    channelId: string,
+    guildId: string,
+    role: string
+  ) {
     const newDate = this.convertStringToDate(date, time);
 
     this.date = newDate;
     this.name = name;
     this.repeat = repeat ?? Repeat.NONE;
     this.channelId = channelId;
+    this.guildId = guildId;
+    this.role = role;
   }
 
   /**
@@ -23,7 +35,7 @@ export class ScheduledEvent {
    */
   isValidDate() {
     // check if the date is a valid date
-    return !isNaN(this.date.getTime());
+    return this.date instanceof Date && !isNaN(this.date.valueOf()) && this.date > new Date();
   }
 
   /**
@@ -33,9 +45,7 @@ export class ScheduledEvent {
   isReady() {
     // add a 20 second buffer to the event to prevent it from being missed
     // and also to prevent it from being executed twice if the bot needs to restart
-    return this.isValidDate() && this.date.getTime() + 20000 >= Date.now()
-      ? this.date.getTime() <= Date.now()
-      : null;
+    return this.isValidDate() && this.date.getTime() + 20000 >= Date.now() ? this.date.getTime() <= Date.now() : null;
   }
 
   /**
@@ -104,17 +114,59 @@ export class ScheduledEvent {
    */
   convertStringToDate(dateString: string, time: string): Date {
     const date = new Date();
-    const fullDate = dateString.split('-');
 
-    // set the date
-    date.setFullYear(parseInt(fullDate[0]));
-    date.setMonth(parseInt(fullDate[1]) - 1);
-    date.setDate(parseInt(fullDate[2]));
-    date.setHours(parseInt(time.split(':')[0]));
-    date.setMinutes(parseInt(time.split(':')[1]));
-    date.setSeconds(0);
+    return this.updateDate(dateString, this.updateTime(time, date));
+  }
 
-    return date;
+  updateTime(time: string, originalDate?: Date) {
+    try {
+      const date = originalDate || this.date;
+      const timeArray = time.split(':');
+
+      if (timeArray.length !== 2 || timeArray[0].length !== 2 || timeArray[1].length !== 2) {
+        throw new Error('Invalid time format');
+      }
+
+      date.setHours(parseInt(timeArray[0]));
+      date.setMinutes(parseInt(timeArray[1]));
+
+      return date;
+    } catch (err) {
+      logger.warn('Error updating time', err);
+
+      return err;
+    }
+  }
+
+  updateDate(dateString: string, originalDate?: Date) {
+    try {
+      const date = originalDate || this.date;
+      const fullDate = dateString.split('-');
+
+      // if the date is not in the format yyyy-mm-dd
+      // very messy, but it works
+      if (
+        fullDate.length !== 3 ||
+        fullDate[0].length !== 4 ||
+        fullDate[1].length > 2 ||
+        fullDate[1].length < 1 ||
+        fullDate[2].length > 2 ||
+        fullDate[2].length < 1 ||
+        parseInt(fullDate[1]) > 12
+      ) {
+        throw new Error('Invalid date format');
+      }
+
+      date.setFullYear(parseInt(fullDate[0]));
+      date.setMonth(parseInt(fullDate[1]) - 1);
+      date.setDate(parseInt(fullDate[2]));
+
+      return date;
+    } catch (err) {
+      logger.warn('Error updating day', err);
+
+      return err;
+    }
   }
 
   changeName(name: string) {
@@ -130,7 +182,9 @@ export class ScheduledEvent {
    * @returns the names of the event and the date
    */
   toString() {
-    return `**Id:** ${this.id}\n**Name**: ${this.name}\n**Date**: ${this.date}`;
+    return `**Id:** ${this.id}\n**Name**: ${this.name}\n\n**Date**: ${this.formatTime()}\n**Repeating**: ${
+      this.repeat
+    }`;
   }
 
   /**
@@ -139,7 +193,7 @@ export class ScheduledEvent {
    */
   formatTime() {
     const month = this.date.getMonth();
-    const day = this.date.getDate();
+    const day = this.getDateOrdinal(this.date.getDate());
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const months = [
       'January',
@@ -159,13 +213,16 @@ export class ScheduledEvent {
     const minutes = this.date.getMinutes();
     const ampm = this.date.getHours() >= 12 ? 'pm' : 'am';
     const dayIsToday =
-      days[this.date.getDay()] === days[new Date().getDay()] &&
-      this.date.getDate() === new Date().getDate();
-    // if the day is today, return today
-    const dayOfWeek = dayIsToday ? 'today' : days[this.date.getDay()];
-    return `${dayOfWeek}, ${months[month]} ${day}, at ${hours}:${
-      minutes < 10 ? '0' + minutes : minutes
-    }${ampm}`;
+      days[this.date.getDay()] === days[new Date().getDay()] && this.date.getDate() === new Date().getDate();
+    // if the day is Today, return today
+    const dayOfWeek = dayIsToday ? 'Today' : days[this.date.getDay()];
+    return `${dayOfWeek}, ${months[month]} ${day}, at ${hours}:${minutes < 10 ? '0' + minutes : minutes}${ampm}`;
+  }
+
+  getDateOrdinal(day: number) {
+    const suffixes = ['th', 'st', 'nd', 'rd'];
+    const remainder = day % 100;
+    return day + (suffixes[(remainder - 20) % 10] || suffixes[remainder] || suffixes[0]);
   }
 }
 

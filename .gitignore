@@ -1,5 +1,6 @@
 node_modules
 combined.log
 config.json
+config-dev.json
 package-lock.json
 events.db

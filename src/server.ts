@@ -1,26 +1,45 @@
 import { Scheduler } from './scheduler';
 import { BaseInteraction, Client, GatewayIntentBits, TextChannel } from 'discord.js';
 import { token } from '../config.json';
+import { token as tokenDev } from '../config-dev.json';
 import { ScheduledEvent, Repeat } from './scheduledEvent';
 import logger from './log';
-import { addEvent, deleteEvent, getEvents, initDb, updateEvent } from './database';
+import { deleteEvent, getEvents, initDb, updateEvent } from './database';
+import { CancelCommand, Command, ScheduleCommand, UpcomingCommand, UpdateCommand } from './commands/command';
+
+const dev = process.argv[2] === 'dev';
+let secret = token;
+
+if (dev) {
+  secret = tokenDev;
+}
 
 const client = new Client({
   intents: [GatewayIntentBits.MessageContent],
 });
 
-let database;
+export let DATABASE;
+
+export const commandList = new Map<string, Command>();
 
 client.once('ready', async () => {
-  logger.info('Bot starting up...');
+  logger.info('Bot ready...');
 
   logger.info('Initializing database...');
   // init the database
-  database = await initDb();
+  DATABASE = await initDb();
 
   // get all events from the database
-  const events = await getEvents(database);
-  Scheduler.setEvents(events);
+  const events = await getEvents(DATABASE);
+  const eventMap = new Map<string, ScheduledEvent[]>();
+  events.forEach((event) => {
+    if (!eventMap.has(event.guildId)) {
+      eventMap.set(event.guildId, []);
+    }
+    eventMap.get(event.guildId).push(event);
+  });
+
+  Scheduler.setEvents(eventMap);
   // init the scheduler
   logger.info('Starting scheduler...');
   // create a new scheduler that will run its main loop every second, checking for events
@@ -32,19 +51,18 @@ client.once('ready', async () => {
 
       // remove the event from the database
       if (event.repeat === Repeat.NONE) {
-        console.log(event);
-        deleteEvent(database, event.id);
+        deleteEvent(DATABASE, event.id);
       }
 
       // send message to channel
       client.channels
         .fetch(event.channelId)
         .then((channel: TextChannel) => {
-          channel.send(`@everyone\n\nEvent Starting!!! **${event?.name}** `);
+          channel.send(`${event?.role || '@everyone'}\n\nEvent Starting!!! **${event?.name}** `);
 
           // update the event in the database if it is repeating
           if (event.repeat !== Repeat.NONE) {
-            updateEvent(database, event);
+            updateEvent(DATABASE, event);
           }
         })
         .catch((err) => {
@@ -64,7 +82,7 @@ client.once('ready', async () => {
       client.channels
         .fetch(event.channelId)
         .then((channel: TextChannel) => {
-          channel.send(`@everyone Reminder!\n\n **${event?.name}** - ${event.formatTime()}`);
+          channel.send(`${event?.role || '@everyone'} Reminder!\n\n **${event?.name}** - ${event.formatTime()}`);
         })
         .catch((err) => {
           logger.error('Failed to send event reminder message to channel', {
@@ -79,73 +97,21 @@ client.once('ready', async () => {
 client.on('interactionCreate', async (interaction: BaseInteraction) => {
   if (!interaction.isChatInputCommand()) return;
 
-  if (interaction.commandName === 'schedule') {
-    const data = interaction.options;
-    const event = new ScheduledEvent(
-      data.getString('date'),
-      data.getString('time'),
-      data.getString('name'),
-      data.getString('repeat') as Repeat,
-      interaction.channelId
-    );
-
-    // the date must be valid and also be in the future
-    if (event.isValidDate() && event.date > new Date()) {
-      logger.info(`Scheduling event: ${event.name}`, {
-        guild: interaction.guildId,
-        channel: interaction.channelId,
-        user: interaction.user.id,
-      });
-      // add event to databases
-      const eventId = await addEvent(database, event);
-
-      event.id = eventId.lastID;
-      Scheduler.scheduleEvent(event);
-      await interaction
-        .reply(`@everyone\nNew event: **${event.name}** scheduled for ${event.formatTime()}`)
-        .catch((err) => {
-          logger.error('Failed to send interaction reply', err);
-        });
-    } else {
-      logger.debug(`Failed to schedule event: ${event.name}`);
-      await interaction.reply('Failed to schedule event. Invalid date/time.');
-    }
-  }
-
-  if (interaction.commandName === 'upcoming') {
-    Scheduler.logEvents();
-    const events = Scheduler.getEvents();
-
-    if (!!events.length) {
-      const reply = events.map((event) => event.toString()).join('\n\n');
-      await interaction.reply(`**Upcoming Events**\n\n${reply}`).catch((err) => {
-        logger.error('Failed to send interaction reply', err);
-      });
-    } else {
-      await interaction.reply('No upcoming events!').catch((err) => {
-        logger.error('Failed to send interaction reply', err);
-      });
-    }
-  }
-
-  if (interaction.commandName === 'cancel') {
-    const data = interaction.options;
-    const id = data.getNumber('id');
-    const event = Scheduler.getEventById(id);
-
-    if (event) {
-      // remove event from db
-      await deleteEvent(database, event);
-      Scheduler.removeEvent(event);
-      await interaction.reply(`Event **${event.name}** cancelled.`).catch((err) => {
-        logger.error('Failed to send interaction reply', err);
-      });
-    } else {
-      await interaction.reply(`Event with id **${id}** not found.`).catch((err) => {
-        logger.error('Failed to send interaction reply', err);
-      });
-    }
+  const command = commandList.get(interaction.commandName);
+  logger.info(`Received Command: ${interaction.commandName}`, {
+    channelId: interaction.channelId,
+    userId: interaction.user.id,
+    guildId: interaction.guildId,
+  });
+  if (command) {
+    command.execute(interaction);
   }
 });
 
-client.login(token);
+client.login(secret);
+
+// register commands
+commandList.set('schedule', new ScheduleCommand());
+commandList.set('upcoming', new UpcomingCommand());
+commandList.set('cancel', new CancelCommand());
+commandList.set('update', new UpdateCommand());

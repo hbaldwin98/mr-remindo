@@ -1,6 +1,7 @@
+import { Database } from 'sqlite';
 import sqlite3 from 'sqlite3';
 import logger from './log';
-import { ScheduledEvent, Repeat } from './scheduledEvent';
+import { ScheduledEvent } from './scheduledEvent';
 const { open } = require('sqlite');
 
 const initDb = async () => {
@@ -30,20 +31,6 @@ const createDbConnection = async (filename: string) => {
   }
 };
 
-// const createDatabase = async () => {
-//   logger.info('Creating new database');
-//   const newdb = new sqlite3.Database('events.db', (err) => {
-//     if (err) {
-//       logger.warn('Failed to create database', err);
-//       // close the application
-//       process.exit(1);
-//     }
-//   });
-
-//   await createTables(newdb);
-//   return newdb;
-// };
-
 const createTables = async (newdb) => {
   // check if the events table already exists
   const tables = await newdb.all('SELECT name FROM sqlite_master WHERE type="table"');
@@ -57,7 +44,9 @@ const createTables = async (newdb) => {
           date TEXT NOT NULL,
           repeat TEXT DEFAULT 'none',
           channelId TEXT NOT NULL,
-          lastReminder TEXT
+          guildId TEXT NOT NULL,
+          lastReminder TEXT,
+          role TEXT
       )
       `
     ),
@@ -72,50 +61,74 @@ const getEvents = async (db) => {
   const events = await db.all('SELECT * FROM events');
   // map the events to ScheduledEvent objects
   return events.map((event) => {
-    const { id, name, date, repeat, channelId } = event;
-    let scheduledEvent = new ScheduledEvent('', '', '', Repeat.NONE, '');
+    const { id, name, date, repeat, channelId, guildId, role } = event;
+    let scheduledEvent = new ScheduledEvent('0000-00-00', '00:00', name, repeat, channelId, guildId, role);
     scheduledEvent.id = id;
-    scheduledEvent.name = name;
     scheduledEvent.date = new Date(parseInt(date));
-    scheduledEvent.repeat = repeat;
-    scheduledEvent.channelId = channelId;
-    scheduledEvent.lastReminder = event.lastReminder
-      ? new Date(parseInt(event.lastReminder))
-      : null;
+    scheduledEvent.lastReminder = event.lastReminder ? new Date(parseInt(event.lastReminder)) : null;
 
     return scheduledEvent;
   });
 };
 
-const updateEvent = async (db, event) => {
+const updateEvent = async (db: Database, event: ScheduledEvent) => {
   logger.info('Updating event in database', { event });
-  await db.run(
-    'UPDATE events SET name = ?, date = ?, repeat = ?, channelId = ?, lastReminder = ? WHERE id = ?',
-    [event.name, event.date, event.repeat, event.channelId, event.id, event.lastReminder]
-  );
+  try {
+    const result = await db.run(
+      'UPDATE events SET name = ?, date = ?, repeat = ?, channelId = ?, lastReminder = ?, guildId = ?, role = ? WHERE id = ?',
+      [event.name, event.date, event.repeat, event.channelId, event.lastReminder, event.guildId, event.role, event.id]
+    );
+
+    return result;
+  } catch (err) {
+    logger.error('Failed to update event in database', { error: err });
+
+    return err;
+  }
 };
 
-const addEvent = async (db, event) => {
-  const { name, date, repeat, channelId, lastReminder } = event;
-  logger.info('Adding event to database', { name, date, repeat, channelId, lastReminder });
-  const result = await db.run(
-    'INSERT INTO events (name, date, repeat, channelId) VALUES (?, ?, ?, ?)',
+const addEvent = async (db: Database, event: ScheduledEvent) => {
+  const { name, date, repeat, channelId, lastReminder, guildId, role } = event;
+  logger.info('Adding event to database', {
     name,
     date,
     repeat,
     channelId,
-    lastReminder
-  );
+    lastReminder,
+    guildId,
+    role,
+  });
+  try {
+    const result = await db.run(
+      'INSERT INTO events (name, date, repeat, channelId, lastReminder, guildId, role) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      name,
+      date,
+      repeat,
+      channelId,
+      lastReminder,
+      guildId,
+      role
+    );
 
-  logger.info('Added event to database', { id: result.lastID });
+    return result;
+  } catch (err) {
+    logger.warn('Failed to add event to database', err);
 
-  return result;
+    return err;
+  }
 };
 
-const deleteEvent = async (db, id) => {
+const deleteEvent = async (db: Database, id: number) => {
   logger.info('Deleting event from database', { id });
-  const result = await db.run('DELETE FROM events WHERE id = ?', id);
-  return result;
+  try {
+    const result = await db.run('DELETE FROM events WHERE id = ?', id);
+
+    return result;
+  } catch (err) {
+    logger.warn('Failed to delete event', err);
+
+    return err;
+  }
 };
 
 export { initDb, getEvents, addEvent, deleteEvent, updateEvent };

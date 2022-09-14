@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node ./src/server.ts",
-    "start:dev": "nodemon ./src/server.ts",
+    "start-process": "pm2 start ./src/server.ts",
+    "start:dev": "ts-node ./src/deploy-commands.ts dev && nodemon ./src/server.ts dev",
     "commands": "ts-node ./src/deploy-commands.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -14,6 +15,7 @@
   "dependencies": {
     "@discordjs/rest": "^1.1.0",
     "discord.js": "^14.3.0",
+    "pm2": "^5.2.0",
     "rxjs": "^7.5.6",
     "sqlite": "^4.1.2",
     "sqlite3": "^5.0.11",
