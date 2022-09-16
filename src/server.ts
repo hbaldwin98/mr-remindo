@@ -5,7 +5,11 @@ import { token } from '../config.json';
 import { ScheduledEvent, Repeat } from './scheduledEvent';
 import logger from './log';
 import { deleteEvent, getEvents, initDb, updateEvent } from './database';
-import { CancelCommand, Command, ScheduleCommand, UpcomingCommand, UpdateCommand } from './commands/command';
+import { Command } from './commands/Command';
+import { ScheduleCommand } from './commands/ScheduleCommand';
+import { UpcomingCommand } from './commands/UpcomingCommand';
+import { CancelCommand } from './commands/CancelCommand';
+import { UpdateCommand } from './commands/UpdateCommand';
 
 // const dev = process.argv[2] === 'dev';
 let secret = token;

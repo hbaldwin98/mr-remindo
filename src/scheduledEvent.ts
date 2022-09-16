@@ -216,7 +216,11 @@ export class ScheduledEvent {
       days[this.date.getDay()] === days[new Date().getDay()] && this.date.getDate() === new Date().getDate();
     // if the day is Today, return today
     const dayOfWeek = dayIsToday ? 'Today' : days[this.date.getDay()];
-    return `${dayOfWeek}, ${months[month]} ${day}, at ${hours}:${minutes < 10 ? '0' + minutes : minutes}${ampm}`;
+    return `${dayOfWeek}, ${months[month]} ${day}, at: 
+          \n${hours}:${minutes < 10 ? '0' + minutes : minutes}${ampm} (PT)
+          \n${hours + 1}:${minutes < 10 ? '0' + minutes : minutes}${ampm} (MT))
+          \n${hours + 2}:${minutes < 10 ? '0' + minutes : minutes}${ampm} (CT)
+          \n${hours + 3}:${minutes < 10 ? '0' + minutes : minutes}${ampm} (ET)`;
   }
 
   getDateOrdinal(day: number) {
