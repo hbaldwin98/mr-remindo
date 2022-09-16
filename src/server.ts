@@ -10,6 +10,7 @@ import { ScheduleCommand } from './commands/ScheduleCommand';
 import { UpcomingCommand } from './commands/UpcomingCommand';
 import { CancelCommand } from './commands/CancelCommand';
 import { UpdateCommand } from './commands/UpdateCommand';
+import dayjs from 'dayjs';
 
 // const dev = process.argv[2] === 'dev';
 let secret = token;
@@ -32,7 +33,6 @@ client.once('ready', async () => {
   logger.info('Initializing database...');
   // init the database
   DATABASE = await initDb();
-
   // get all events from the database
   const events = await getEvents(DATABASE);
   const eventMap = new Map<string, ScheduledEvent[]>();

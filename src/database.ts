@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { Database } from 'sqlite';
 import sqlite3 from 'sqlite3';
 import logger from './log';
@@ -62,10 +63,9 @@ const getEvents = async (db) => {
   // map the events to ScheduledEvent objects
   return events.map((event) => {
     const { id, name, date, repeat, channelId, guildId, role } = event;
-    let scheduledEvent = new ScheduledEvent('0000-00-00', '00:00', name, repeat, channelId, guildId, role);
+    let scheduledEvent = new ScheduledEvent(dayjs(date), name, repeat, channelId, guildId, role);
     scheduledEvent.id = id;
-    scheduledEvent.date = new Date(parseInt(date));
-    scheduledEvent.lastReminder = event.lastReminder ? new Date(parseInt(event.lastReminder)) : null;
+    scheduledEvent.lastReminder = event.lastReminder ? dayjs(event.lastReminder) : null;
 
     return scheduledEvent;
   });

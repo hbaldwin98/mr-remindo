@@ -15,8 +15,8 @@ export class CancelCommand extends Command {
     const id = data.getNumber('id');
     const event = Scheduler.getEventById(interaction.guildId, id);
 
-    if (event.guildId !== interaction.guildId) {
-      logger.debug('User tried to update event from another guild');
+    if (!event) {
+      logger.debug('No event with this id for this guild.');
       await interaction.reply({
         content: 'There is no event with this id.',
         ephemeral: true,

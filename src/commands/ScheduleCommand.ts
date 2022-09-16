@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { ChatInputCommandInteraction } from 'discord.js';
 import { addEvent } from '../database';
 import logger from '../log';
@@ -13,19 +14,20 @@ export class ScheduleCommand extends Command {
 
   public async execute(interaction: ChatInputCommandInteraction) {
     const data = interaction.options;
-    const event = new ScheduledEvent(
-      data.getString('date'),
-      data.getString('time'),
-      data.getString('name'),
-      data.getString('repeat') as Repeat,
-      interaction.channelId,
-      interaction.guildId,
-      data.get('role')?.role?.name
-    );
 
-    const isValid = event.isValidDate();
+    const date = dayjs(data.getString('date') + ' ' + data.getString('time'), 'YYYY-MM-DD HH:mm');
+    const name = data.getString('name');
     // the date must be valid and also be in the future
-    if (isValid) {
+    if (date.isValid() && date > dayjs()) {
+      const event = new ScheduledEvent(
+        date,
+        data.getString('name'),
+        data.getString('repeat') as Repeat,
+        interaction.channelId,
+        interaction.guildId,
+        data.get('role')?.role?.name
+      );
+
       logger.info(`Scheduling event: ${event.name}`, {
         guild: interaction.guildId,
         channel: interaction.channelId,
@@ -51,7 +53,7 @@ export class ScheduleCommand extends Command {
         });
       }
     } else {
-      logger.debug(`Failed to schedule event: ${event.name}`);
+      logger.debug(`Failed to schedule event: ${name}`);
       await interaction.reply({
         content: 'Failed to schedule event. Invalid date/time.',
         ephemeral: true,

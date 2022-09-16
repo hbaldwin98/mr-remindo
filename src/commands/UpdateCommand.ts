@@ -1,3 +1,4 @@
+import dayjs, { Dayjs } from 'dayjs';
 import { CacheType, ChatInputCommandInteraction } from 'discord.js';
 import { updateEvent } from '../database';
 import logger from '../log';
@@ -36,31 +37,14 @@ export class UpdateCommand extends Command {
         data.get('role')?.role?.name,
       ];
 
-      if (date && !time) {
-        const updatedDate = event.updateDate(date);
-        if (updatedDate.message) {
-          await interaction.reply({ content: updatedDate.message, ephemeral: true });
-          return;
-        }
-        event.date = event.updateDate(date) || event.date;
-      } else if (time && !date) {
-        const updatedDate = event.updateTime(time);
-        if (updatedDate.message) {
-          await interaction.reply({ content: updatedDate.message, ephemeral: true });
-          return;
-        }
-        event.date = event.updateTime(time) || event.date;
-      } else {
-        event.date = date && time ? event.convertStringToDate(date, time) : event.date;
-      }
-
+      event.date = dayjs(data.getString('date') + ' ' + data.getString('time'), 'YYYY-MM-DD HH:mm');
       // update the event values
       event.name = name || event.name;
       event.repeat = repeat || event.repeat;
       event.channelId = channelId || event.channelId;
       event.role = role || event.role;
 
-      if (event.isValidDate() && event.date > new Date()) {
+      if (event.date.isValid() && event.date > dayjs()) {
         logger.info(`Updating event: ${event.name}`, {
           guild: interaction.guildId,
           channel: interaction.channelId,
