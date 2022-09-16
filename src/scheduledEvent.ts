@@ -58,7 +58,7 @@ export class ScheduledEvent {
     const date = new Date();
     date.setDate(date.getDate() + days);
 
-    return this.date.getDate() === date.getDate() && this.date.getHours() === 8;
+    return this.date.getDate() === date.getDate() && this.date.getHours() >= 8;
   }
 
   /**
