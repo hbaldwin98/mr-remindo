@@ -4,8 +4,8 @@ import { clientId, token } from '../config.json';
 import { Repeat } from './scheduledEvent';
 
 // const dev = process.argv[2] === 'dev';
-let clientID = clientId;
-let secret = token;
+const clientID = clientId;
+const secret = token;
 
 // if (dev) {
 //   clientID = clientIdDev;

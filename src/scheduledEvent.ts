@@ -26,7 +26,7 @@ export class ScheduledEvent {
   isReady() {
     // add a 20 second buffer to the event to prevent it from being missed
     // and also to prevent it from being executed twice if the bot needs to restart
-    return this.date.isValid() && this.date.unix() + 20 >= dayjs().unix() ? this.date.unix() <= dayjs().unix() : null;
+    return this.date.isValid() && this.date.unix() + 60 >= dayjs().unix() ? this.date.unix() <= dayjs().unix() : null;
   }
 
   /**
@@ -39,7 +39,7 @@ export class ScheduledEvent {
     const date = dayjs();
     date.add(days, 'day');
 
-    return this.date.valueOf() >= date.valueOf() && this.date.hour() >= 7;
+    return this.date.valueOf() >= date.valueOf() && this.date.hour() >= 8;
   }
 
   /**

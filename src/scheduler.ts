@@ -10,8 +10,6 @@ export class Scheduler {
   public static eventCompleted = new BehaviorSubject<ScheduledEvent>(null);
   public static eventReminder = new BehaviorSubject<ScheduledEvent>(null);
 
-  private constructor() {}
-
   public static getInstance(): Scheduler {
     if (!Scheduler.instance) {
       Scheduler.instance = new Scheduler();

@@ -1,4 +1,4 @@
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { CacheType, ChatInputCommandInteraction } from 'discord.js';
 import { updateEvent } from '../database';
 import logger from '../log';
@@ -27,17 +27,16 @@ export class UpdateCommand extends Command {
     }
 
     if (event) {
-      const [date, time, name, repeat, channelId, guildId, role] = [
+      const [date, time, name, repeat, channelId, role] = [
         data.getString('date'),
         data.getString('time'),
         data.getString('name'),
         data.getString('repeat') as Repeat,
         interaction.channelId,
-        interaction.guildId,
         data.get('role')?.role?.name,
       ];
 
-      event.date = dayjs(data.getString('date') + ' ' + data.getString('time'), 'YYYY-MM-DD HH:mm');
+      event.date = dayjs(time + ' ' + date, 'YYYY-MM-DD HH:mm');
       // update the event values
       event.name = name || event.name;
       event.repeat = repeat || event.repeat;

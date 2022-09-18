@@ -3,7 +3,7 @@ import { Database } from 'sqlite';
 import sqlite3 from 'sqlite3';
 import logger from './log';
 import { ScheduledEvent } from './scheduledEvent';
-const { open } = require('sqlite');
+import { open } from 'sqlite';
 
 const initDb = async () => {
   try {
@@ -32,7 +32,7 @@ const createDbConnection = async (filename: string) => {
   }
 };
 
-const createTables = async (newdb) => {
+const createTables = async (newdb: Database) => {
   // check if the events table already exists
   const tables = await newdb.all('SELECT name FROM sqlite_master WHERE type="table"');
   if (tables.length === 0) {
@@ -57,13 +57,13 @@ const createTables = async (newdb) => {
   }
 };
 
-const getEvents = async (db) => {
+const getEvents = async (db: Database) => {
   logger.info('Getting events from database');
   const events = await db.all('SELECT * FROM events');
   // map the events to ScheduledEvent objects
   return events.map((event) => {
     const { id, name, date, repeat, channelId, guildId, role } = event;
-    let scheduledEvent = new ScheduledEvent(dayjs(date), name, repeat, channelId, guildId, role);
+    const scheduledEvent = new ScheduledEvent(dayjs(date), name, repeat, channelId, guildId, role);
     scheduledEvent.id = id;
     scheduledEvent.lastReminder = event.lastReminder ? dayjs(event.lastReminder) : null;
 

@@ -10,10 +10,9 @@ import { ScheduleCommand } from './commands/ScheduleCommand';
 import { UpcomingCommand } from './commands/UpcomingCommand';
 import { CancelCommand } from './commands/CancelCommand';
 import { UpdateCommand } from './commands/UpdateCommand';
-import dayjs from 'dayjs';
 
 // const dev = process.argv[2] === 'dev';
-let secret = token;
+const secret = token;
 
 // if (dev) {
 //   secret = tokenDev;
