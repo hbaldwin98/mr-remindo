@@ -36,10 +36,10 @@ export class ScheduledEvent {
    * @returns
    */
   isDaysBefore(days: number) {
-    const date = dayjs();
-    date.add(days, 'day');
+    let date = dayjs();
+    date = date.add(days, 'day');
 
-    return this.date.valueOf() >= date.valueOf() && this.date.hour() >= 8;
+    return this.date.valueOf() <= date.valueOf() && this.date.hour() >= 8;
   }
 
   /**
