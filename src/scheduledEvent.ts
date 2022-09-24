@@ -49,17 +49,19 @@ export class ScheduledEvent {
    */
   canRemind() {
     if (!this.lastReminder) {
-      this.lastReminder = dayjs();
       return true;
     }
 
-    // if the last reminder was more than 24 hours ago
-    if (this.lastReminder.unix() + 86400 <= dayjs().unix()) {
-      this.lastReminder = dayjs();
+    // if the last reminder was yesterday
+    if (this.lastReminder.day() + 1 <= dayjs().day()) {
       return true;
     }
 
     return false;
+  }
+
+  updateLastReminder() {
+    this.lastReminder = dayjs();
   }
 
   /**

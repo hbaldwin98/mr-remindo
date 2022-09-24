@@ -81,6 +81,7 @@ client.once('ready', async () => {
   Scheduler.eventReminder.subscribe((event: ScheduledEvent) => {
     if (event) {
       logger.info(`Event Reminder: ${event?.name}`, { channelId: event.channelId });
+      event.updateLastReminder();
       // send message to channel
       client.channels
         .fetch(event.channelId)
