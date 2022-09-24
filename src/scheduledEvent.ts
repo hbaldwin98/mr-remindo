@@ -39,7 +39,7 @@ export class ScheduledEvent {
     let date = dayjs();
     date = date.add(days, 'day');
 
-    return this.date.valueOf() <= date.valueOf() && this.date.hour() >= 8;
+    return this.date.date() <= date.date() && date.hour() >= 8;
   }
 
   /**
@@ -53,7 +53,7 @@ export class ScheduledEvent {
     }
 
     // if the last reminder was yesterday
-    if (this.lastReminder.day() + 1 <= dayjs().day()) {
+    if (this.lastReminder.date() + 1 <= dayjs().date()) {
       return true;
     }
 
