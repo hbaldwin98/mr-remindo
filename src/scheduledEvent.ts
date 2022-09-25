@@ -76,15 +76,15 @@ export class ScheduledEvent {
         break;
       case Repeat.DAILY:
         Scheduler.completeEvent(this);
-        this.date.add(1, 'day');
+        this.date = this.date.add(1, 'day');
         break;
       case Repeat.WEEKLY:
         Scheduler.completeEvent(this);
-        this.date.add(7, 'day');
+        this.date = this.date.add(7, 'day');
         break;
       case Repeat.MONTHLY:
         Scheduler.completeEvent(this);
-        this.date.add(1, 'month');
+        this.date = this.date.add(1, 'month');
         break;
     }
   }
