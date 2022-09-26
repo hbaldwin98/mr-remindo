@@ -39,7 +39,7 @@ export class ScheduledEvent {
     let date = dayjs();
     date = date.add(days, 'day');
 
-    return this.date.date() <= date.date() && date.hour() >= 8;
+    return date.hour() >= 8 && this.date.diff(date, 'day') === 0;
   }
 
   /**
