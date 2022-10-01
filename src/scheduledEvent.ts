@@ -55,7 +55,10 @@ export class ScheduledEvent {
     }
 
     // if the last reminder was yesterday
-    if (this.lastReminder.add(1, 'day').isSame(dayjs().date()) || this.lastReminder.isBefore(dayjs().date())) {
+    if (
+      this.lastReminder.add(1, 'day').isSame(dayjs().date()) ||
+      (this.lastReminder.isBefore(dayjs().date()) && !this.lastReminder.isSame(dayjs().date()))
+    ) {
       return true;
     }
 
