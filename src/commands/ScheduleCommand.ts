@@ -18,7 +18,7 @@ export class ScheduleCommand extends Command {
     const date = dayjs(data.getString('date') + ' ' + data.getString('time'), 'YYYY-MM-DD HH:mm');
     const name = data.getString('name');
     // the date must be valid and also be in the future
-    if (date.isValid() && date > dayjs()) {
+    if (date.isValid() && date > dayjs(Date.now())) {
       const event = new ScheduledEvent(
         date,
         data.getString('name'),
