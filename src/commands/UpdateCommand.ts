@@ -43,7 +43,7 @@ export class UpdateCommand extends Command {
       event.channelId = channelId || event.channelId;
       event.role = role || event.role;
 
-      if (event.date.isValid() && event.date > dayjs()) {
+      if (event.date.isValid() && event.date > dayjs(Date.now())) {
         logger.info(`Updating event: ${event.name}`, {
           guild: interaction.guildId,
           channel: interaction.channelId,
