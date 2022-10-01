@@ -1,6 +1,4 @@
-import { DATABASE } from './server';
 import dayjs from 'dayjs';
-import { updateEvent } from './database';
 import { Scheduler } from './scheduler';
 export class ScheduledEvent {
   public name: string;
@@ -38,10 +36,7 @@ export class ScheduledEvent {
    * @returns
    */
   isDaysBefore(days: number) {
-    let date = dayjs();
-    date = date.add(days, 'day');
-
-    return date.hour() >= 8 && this.date.isSame(date, 'day');
+    return dayjs().hour() >= 8 && dayjs().add(days, 'day').isSame(this.date, 'day');
   }
 
   /**
@@ -57,7 +52,7 @@ export class ScheduledEvent {
     // if the last reminder was yesterday
     if (
       this.lastReminder.add(1, 'day').isSame(dayjs().date()) ||
-      (this.lastReminder.isBefore(dayjs().date()) && !this.lastReminder.isSame(dayjs().date()))
+      (this.lastReminder.isBefore(dayjs(), 'day') && !this.lastReminder.isSame(dayjs(), 'day'))
     ) {
       return true;
     }
