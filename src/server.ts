@@ -82,6 +82,7 @@ client.once('ready', async () => {
     if (event) {
       logger.info(`Event Reminder: ${event?.name}`, { channelId: event.channelId });
       event.updateLastReminder();
+      updateEvent(DATABASE, event);
       // send message to channel
       client.channels
         .fetch(event.channelId)
