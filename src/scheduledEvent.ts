@@ -26,9 +26,7 @@ export class ScheduledEvent {
   isReady() {
     // add a 20 second buffer to the event to prevent it from being missed
     // and also to prevent it from being executed twice if the bot needs to restart
-    return this.date.isValid() && this.date.unix() + 60 >= dayjs(Date.now()).unix()
-      ? this.date.unix() <= dayjs(Date.now()).unix()
-      : null;
+    return this.date.isValid() && this.date.unix() + 60 >= dayjs().unix() ? this.date.isSame(dayjs(), 'day') : null;
   }
 
   /**
@@ -38,10 +36,10 @@ export class ScheduledEvent {
    * @returns
    */
   isDaysBefore(days: number) {
-    let date = dayjs(Date.now());
+    let date = dayjs();
     date = date.add(days, 'day');
 
-    return date.hour() >= 8 && this.date.diff(date, 'day') === 0;
+    return date.hour() >= 8 && this.date.isSame(date, 'day');
   }
 
   /**
@@ -55,7 +53,7 @@ export class ScheduledEvent {
     }
 
     // if the last reminder was yesterday
-    if (this.lastReminder.date() + 1 <= dayjs(Date.now()).date()) {
+    if (this.lastReminder.add(1, 'day').isSame(dayjs().date())) {
       return true;
     }
 
@@ -63,7 +61,7 @@ export class ScheduledEvent {
   }
 
   updateLastReminder() {
-    this.lastReminder = dayjs(Date.now());
+    this.lastReminder = dayjs();
   }
 
   /**
